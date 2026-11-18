@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font-size: 14px; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Alumni Connect</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: phone-style app column, centred on wide screens. Top bar, impact strip, four tabs (Match, Network, Circles, Board). */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --ink: #14171f;
+  --muted: #5d6472;
+  --line: #e1e4ea;
+  --accent: #f2b705;
+  --on-accent: #14171f;
+  --good: #0f766e;
+  --good-bg: #dff3f0; --bad: #b4372c;
+  --chip: #eceef3;
+  --font-head: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218; --surface: #181c25; --ink: #eef0f5; --muted: #9aa2b1; --line: #2a303c;
+    --accent: #f2b705; --on-accent: #14171f; --good: #5fd3c6; --good-bg: #123a36; --bad: #ff8b7e; --chip: #232936;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218; --surface: #181c25; --ink: #eef0f5; --muted: #9aa2b1; --line: #2a303c;
+  --accent: #f2b705; --on-accent: #14171f; --good: #5fd3c6; --good-bg: #123a36; --bad: #ff8b7e; --chip: #232936;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; padding-block: 16px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.app { max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { font-family: var(--font-head); margin: 0; text-wrap: balance; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { font-family: var(--font-head); font-weight: 700; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+.demo-tag { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.me { color: var(--muted); font-size: 13px; margin: 0; }
+
+.impact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.impact div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.impact b { display: block; font-family: var(--font-head); font-size: 22px; font-variant-numeric: tabular-nums; }
+.impact span { font-size: 12px; color: var(--muted); }
+
+.tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--chip); border-radius: 12px; padding: 4px; gap: 4px; }
+.tabs button { border: 0; background: transparent; color: var(--muted); padding: 8px 0; border-radius: 9px; font-weight: 600; font-size: 13px; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.badge { display: inline-block; min-width: 16px; padding: 0 4px; margin-left: 2px; border-radius: 99px; background: var(--accent); color: var(--on-accent); font-size: 11px; }
+
+.cats { display: flex; flex-direction: column; gap: 6px; }
+.cat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.cat-row button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 8px 2px; font-weight: 600; font-size: 14px; }
+.cat-row button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.between { justify-content: space-between; }
+.chip { background: var(--chip); border-radius: 999px; padding: 2px 10px; font-size: 12.5px; }
+.chip.tag { background: var(--good-bg); color: var(--good); font-weight: 600; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.label { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+.avatar { width: 44px; height: 44px; border-radius: 12px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-family: var(--font-head); font-weight: 700; flex: none; }
+.avatar.sm { width: 34px; height: 34px; font-size: 14px; border-radius: 9px; }
+.profile-head { display: flex; gap: 12px; align-items: center; }
+.meter { height: 8px; border-radius: 99px; background: var(--chip); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--good); }
+.swipe { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#view { overflow-x: clip; }
+.swipeable { position: relative; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.swipeable:active { cursor: grabbing; }
+.swipe-hint { margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 15px; font-weight: 700; }
+.swipe-hint .sl { color: var(--bad); }
+.swipe-hint .sr { color: var(--good); }
+.swipe .btn { padding: 16px 12px; font-size: 17px; }
+.stamp { position: absolute; top: 16px; padding: 4px 12px; border: 4px solid; border-radius: 10px; background: var(--surface); font-family: var(--font-head); font-weight: 700; font-size: 24px; letter-spacing: .04em; opacity: 0; pointer-events: none; }
+.stamp.yes { left: 14px; color: var(--good); border-color: var(--good); transform: rotate(-8deg); }
+.stamp.no { right: 14px; color: var(--bad); border-color: var(--bad); transform: rotate(8deg); }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 12px; font-weight: 600; }
+.btn.yes { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.sm { padding: 6px 12px; font-size: 13px; border-radius: 9px; }
+.btn[aria-pressed="true"], .btn.done { background: var(--good-bg); color: var(--good); border-color: transparent; }
+.enter { animation: pop .25s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation: none; } }
+
+.notice { background: var(--good-bg); border: 1px solid var(--good); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.notice b { color: var(--good); font-family: var(--font-head); }
+.sec { display: flex; flex-direction: column; gap: 10px; }
+.list { display: flex; flex-direction: column; gap: 12px; }
+.item { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.item:first-child { border-top: 0; padding-top: 0; }
+.who { display: flex; gap: 10px; align-items: center; }
+.quote { background: var(--chip); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.thread { display: flex; flex-direction: column; gap: 6px; }
+.msg { max-width: 88%; padding: 8px 12px; border-radius: 12px; font-size: 14px; background: var(--chip); }
+.msg.me { align-self: flex-end; background: var(--accent); color: var(--on-accent); }
+.kind { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; }
+.kind.ask { background: var(--accent); color: var(--on-accent); }
+.kind.offer { background: var(--good-bg); color: var(--good); }
+form { display: flex; flex-direction: column; gap: 8px; }
+textarea, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; width: 100%; }
+.people { display: flex; flex-direction: column; gap: 8px; }
+.people > div { display: flex; gap: 10px; align-items: center; }
+.foot { font-size: 12px; color: var(--muted); text-align: center; }
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gallery:empty { display: none; }
+.gallery img, .thumb img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; }
+.thumb { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.card-photo { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 12px; display: block; pointer-events: none; -webkit-user-drag: none; user-select: none; }
+input[type="file"] { font: inherit; font-size: 13px; color: var(--ink); width: 100%; }
+.stars { color: var(--accent); letter-spacing: 1px; white-space: nowrap; }
+.stars .off { color: var(--line); }
+.star { border: 0; background: none; padding: 2px 4px; font-size: 32px; line-height: 1; color: var(--line); cursor: pointer; }
+.star.on { color: var(--accent); }
+.star:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.slogan { margin: 8px 0 10px; font-family: var(--font-head); font-weight: 700; font-size: 22px; line-height: 1.35; text-wrap: balance; }
+.slogan .no { color: var(--muted); }
+.slogan .yes { background: var(--accent); color: var(--on-accent); padding: 3px 10px; border-radius: 6px; white-space: nowrap; }
+.top-right { display: flex; align-items: center; gap: 8px; }
+.icon-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.search { display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.res { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 10px; }
+.res:first-child { border-top: 0; padding-top: 0; }
+.btn:disabled { opacity: .5; cursor: default; }
+.link { border: 0; background: none; padding: 0; color: var(--ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+input[type="text"], input[type="datetime-local"] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; width: 100%; }
+input[type="text"]:focus-visible, input[type="datetime-local"]:focus-visible, .link:focus-visible, .socials a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 13px; font-weight: 600; }
+.socials a { color: var(--ink); text-decoration: none; background: var(--chip); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+.socials a:hover { text-decoration: underline; }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><span class="dot"></span>Alumni Connect</div>
+    <div class="top-right"><span class="demo-tag">Demo · example data</span><button class="icon-btn" id="search-btn" type="button" aria-label="Search businesses and categories" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.5" y1="15.5" x2="21" y2="21"></line></svg></button></div>
+  </div>
+  <p class="slogan"><span class="no">Dating? No!</span> <span class="yes">Startups? Yes!</span></p>
+  <div class="search" id="search" hidden>
+    <input type="text" id="q" placeholder="Search a business or a category" aria-label="Search a business or a category" autocomplete="off">
+    <div id="results" class="list"></div>
+  </div>
+  <p class="me">Signed in as <b id="me-name">Fern &amp; Co Bookkeeping</b> · Build A Business alumni · <button class="link" id="to-profile" type="button">My profile</button></p>
+
+  <div class="impact" aria-label="Pilot results so far">
+    <div><b id="s-conn">0</b><span>Connected</span></div>
+    <div><b id="s-intros">0</b><span>Introductions</span></div>
+    <div><b id="s-sales">0</b><span>Sales from intros</span></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-match" aria-selected="true" data-tab="match">Match</button>
+    <button role="tab" id="t-network" aria-selected="false" data-tab="network">Network<span class="badge" id="badge" hidden></span></button>
+    <button role="tab" id="t-circles" aria-selected="false" data-tab="circles">Circles</button>
+    <button role="tab" id="t-board" aria-selected="false" data-tab="board">Board</button>
+    <button role="tab" id="t-market" aria-selected="false" data-tab="market">Market</button>
+  </div>
+
+  <main id="view"></main>
+  <p class="foot">Concept demo for the Build A Business hackathon. All businesses and messages are made up.</p>
+</div>
+
+<script>
+(function () {
+  var CATS = {
+    connect: { label: "Connect", blurb: "Meet other founders. No strings attached." },
+    collab: { label: "Collab", blurb: "Share customers or run a joint offer. Competitors are hidden." },
+    learn: { label: "Learn", blurb: "Get advice from a founder further along." },
+    teach: { label: "Teach", blurb: "Share what you know with founders earlier in their journey." },
+    all: { label: "All", blurb: "Everyone, in any category. Each card shows what they are open to." }
+  };
+  var ORDER = ["connect", "collab", "learn", "teach"];
+
+  function svgUri(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
+  var IMG_BRAND = svgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><rect width='600' height='400' fill='#f2b705'/><rect x='60' y='60' width='200' height='280' rx='16' fill='#14171f'/><text x='160' y='215' font-family='Arial,Helvetica,sans-serif' font-size='96' font-weight='700' fill='#f2b705' text-anchor='middle'>BB</text><rect x='300' y='60' width='240' height='80' rx='12' fill='#ffffff'/><rect x='300' y='160' width='240' height='80' rx='12' fill='#0f766e'/><rect x='300' y='260' width='240' height='80' rx='12' fill='#14171f'/><circle cx='340' cy='100' r='18' fill='#f2b705'/><circle cx='340' cy='200' r='18' fill='#ffffff'/><circle cx='340' cy='300' r='18' fill='#f2b705'/></svg>");
+  var IMG_FOOD = svgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><rect width='600' height='400' fill='#0f766e'/><rect y='280' width='600' height='120' fill='#14171f'/><ellipse cx='300' cy='292' rx='190' ry='34' fill='#2a303c'/><ellipse cx='300' cy='272' rx='170' ry='28' fill='#f4f5f7'/><circle cx='250' cy='250' r='34' fill='#f2b705'/><circle cx='320' cy='240' r='30' fill='#e8643c'/><circle cx='372' cy='256' r='26' fill='#8bc34a'/><path d='M180 120 q15 -25 0 -50 M300 130 q15 -25 0 -50 M420 120 q15 -25 0 -50' stroke='#dff3f0' stroke-width='8' fill='none' stroke-linecap='round'/></svg>");
+  var SAMPLES = [{ label: "Brand moodboard", src: IMG_BRAND }, { label: "Catering plate", src: IMG_FOOD }];
+
+  var people = [
+    { id: 1, name: "Brickworks Brand Studio", short: "BB", photo: IMG_BRAND, does: "Logos and branding for small shops and cafés", cats: ["connect", "collab", "learn"], likesYou: true,
+      connect: { line: "Also based in Ancoats. Runs a monthly sketch club for founders.", step: "Grab a coffee this week. No agenda." },
+      collab: { customers: ["Local shops", "Cafés", "New startups"], overlap: 92, offers: "10% off branding for referred customers", wants: "Bookkeeping help for their clients", step: "Book a 15-minute call and agree one joint offer: a free books health-check with every new brand." },
+      learn: { teaches: "Positioning a small business so customers remember it", step: "Ask for a 30-minute call on your own branding." } },
+    { id: 2, name: "Mill Street Insurance", short: "MS", does: "Business insurance for independent traders", cats: ["collab", "learn"], likesYou: true,
+      collab: { customers: ["Local shops", "Market traders", "New startups"], overlap: 85, offers: "Warm intros to newly insured traders", wants: "Accountants to refer on", step: "Swap three customer introductions each this month. Each founder asks their customer first." },
+      learn: { teaches: "Choosing business insurance without overpaying", step: "Book a 30-minute advice call." } },
+    { id: 3, name: "Loop Events", short: "LE", does: "Pop-ups and launch events for local venues", cats: ["connect", "collab"], likesYou: false,
+      connect: { line: "Hosts the quarterly alumni showcase. Knows most venues in Manchester.", step: "Say hello at the next circle." },
+      collab: { customers: ["Cafés", "Venues", "Local shops"], overlap: 71, offers: "Stall space at the quarterly alumni showcase", wants: "A finance partner for their clients", step: "Co-host a stall at the next showcase and collect sign-ups together." } },
+    { id: 4, name: "PixelPatch Web Design", short: "PP", does: "Simple websites for independent businesses", cats: ["collab", "teach"], likesYou: false,
+      collab: { customers: ["Local shops", "New startups"], overlap: 78, offers: "Free site review for referred founders", wants: "Founders ready to sell online", step: "Each of you shares the other's name with two customers this week." },
+      teach: { wants: "How to price a first retainer and send proper invoices", step: "Offer a 30-minute call on pricing and invoicing." } },
+    { id: 5, name: "Northside Fitness Coaching", short: "NF", does: "Small-group coaching, 6 months in", cats: ["connect", "teach"], likesYou: true,
+      connect: { line: "Newer to the network and keen to meet people in the same stage.", step: "Welcome them with a coffee." },
+      teach: { wants: "Setting up books and getting VAT right", step: "Offer a 30-minute call on bookkeeping basics." } },
+    { id: 6, name: "Harbour Street Catering", short: "HS", photo: IMG_FOOD, does: "Event catering, 3 years in", cats: ["connect", "learn"], likesYou: true,
+      connect: { line: "Based near Salford Quays. Often looks for local suppliers.", step: "Grab a coffee this week." },
+      learn: { teaches: "Growing from 1 to 5 staff without losing quality", step: "Book a 30-minute call on hiring." } }
+  ];
+  function byId(id) { for (var i = 0; i < people.length; i++) if (people[i].id === id) return people[i]; return null; }
+
+  var state = {
+    tab: "match", cat: "collab",
+    seen: {},             // "cat:id" -> true once passed, swiped or messaged
+    connected: [],        // {id,name,short,cat,thread:[{from,text}],intro,sale}
+    requested: [],        // {id,name,short,cat,msg}
+    incoming: [
+      { id: 101, name: "Greenfield Tutors", short: "GT", cat: "learn", msg: "Hi! I'm six months in and VAT is a mess. Could you spare 20 minutes?" },
+      { id: 102, name: "Cobble & Co Joinery", short: "CJ", cat: "collab", msg: "We build shopfronts for local shops. Would a joint offer with your bookkeeping work?" }
+    ],
+    composing: null, draft: "", open: null, rsvp: false, filter: "all", replied: {}, matchNote: null, viewBiz: null, mf: "all", adForm: false, circleForm: false, focusId: null, nf: "all", profileSaved: false, joined: {}, copen: null, cf: { format: "all", goal: "all" },
+    profile: { name: "Fern & Co Bookkeeping", sector: "Finance and bookkeeping", description: "Friendly bookkeeping for sole traders and small shops in Greater Manchester. Monthly books, VAT and year-end, in plain English.", customers: "Local shops, Sole traders, Cafés", offers: "Free 30-minute books health-check for referred customers", wants: "Introductions to branding and web design studios", website: "", linkedin: "", instagram: "", x: "", photos: [] }
+  };
+  var posts = [
+    { id: 1, kind: "ask", topic: "Pricing", by: "Loop Events", text: "How do you price a first retainer when the client has no budget history?", age: "1d", replies: 0 },
+    { id: 2, kind: "offer", topic: "Design", by: "Brickworks Brand Studio", text: "I can review one pitch deck this week, free, for any alumni founder.", age: "2d", replies: 1 },
+    { id: 3, kind: "ask", topic: "Customers", by: "PixelPatch Web Design", text: "Anyone sold to Ancoats cafés? Looking for an intro to one owner.", age: "3d", replies: 0 },
+    { id: 4, kind: "ask", topic: "Legal", by: "Mill Street Insurance", text: "Who has a template contract for freelance associates?", age: "4d", replies: 2 },
+    { id: 5, kind: "ask", topic: "Finance", by: "Anonymous founder", anon: true, text: "I'm behind on my tax return and embarrassed to say so. Who can help me catch up without judgement?", age: "5d", replies: 0 }
+  ];
+  var view = document.getElementById("view");
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (attrs[k] == null) return;
+      if (k === "class") n.className = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else if (k.indexOf("on") === 0) n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function chips(list) { return el("div", { class: "row" }, list.map(function (t) { return el("span", { class: "chip", text: t }); })); }
+  function isLinked(id) {
+    return state.connected.some(function (c) { return c.id === id; }) || state.requested.some(function (r) { return r.id === id; });
+  }
+  function field(label, text) { return el("div", {}, [el("div", { class: "label", text: label }), el("div", { text: text })]); }
+
+  function deck() {
+    var list = people.filter(function (p) { return !isLinked(p.id) && effCat(p) !== null; });
+    list.sort(function (a, b) { return (b.id === state.focusId) - (a.id === state.focusId); });
+    return list;
+  }
+  function effCat(p) {
+    if (state.cat !== "all") return p.cats.indexOf(state.cat) > -1 && !state.seen[state.cat + ":" + p.id] ? state.cat : null;
+    for (var i = 0; i < ORDER.length; i++) {
+      var k = ORDER[i];
+      if (p.cats.indexOf(k) > -1 && !state.seen[k + ":" + p.id]) return k;
+    }
+    return null;
+  }
+  function markSeen(p, cat) { (state.cat === "all" ? p.cats : [cat]).forEach(function (k) { state.seen[k + ":" + p.id] = true; }); }
+  function connect(p, cat, thread) {
+    state.connected.push({ id: p.id, name: p.name, short: p.short, cat: cat, thread: thread || [], intro: false, sale: false });
+  }
+
+  /* ---------- Match tab ---------- */
+  function matchView() {
+    var frag = document.createDocumentFragment();
+    var catBox = el("div", { class: "cats" }, [
+      el("div", { class: "label", text: "I'm looking for" }),
+      el("div", { class: "cat-row" }, ["all"].concat(ORDER).map(function (k) {
+        return el("button", { "aria-pressed": String(state.cat === k), onclick: function () { state.cat = k; state.composing = null; state.matchNote = null; render(); } }, [CATS[k].label]);
+      })),
+      el("p", { class: "hint", text: CATS[state.cat].blurb + " Swipes are private. A match only happens if both sides say yes." })
+    ]);
+    frag.appendChild(catBox);
+
+    if (state.matchNote) {
+      frag.appendChild(el("div", { class: "notice enter" }, [
+        el("b", { text: "It's a match: " + state.matchNote.name }),
+        el("div", { class: "small", text: "You're now connected. Open the Network tab to chat. Suggested first step: " + state.matchNote.step })
+      ]));
+    }
+
+    var d = deck(), p = d[0];
+    var cat = p ? effCat(p) : state.cat;
+    if (!p) {
+      frag.appendChild(el("div", { class: "card" }, [
+        el("h3", { text: "You're up to date in " + CATS[cat].label }),
+        el("div", { class: "muted", text: "New profiles appear when the next cohort joins or a founder updates their profile. Try another category above." })
+      ]));
+      return frag;
+    }
+
+    var info = [];
+    if (cat === "collab") {
+      var c = p.collab;
+      info = [
+        field("Sells to", ""), chips(c.customers),
+        el("div", { class: "row" }, [el("span", { class: "chip tag", text: "You might share similar customers" })]),
+        field("Offers", c.offers), field("Looking for", c.wants)
+      ];
+      info.shift(); info.unshift(el("div", { class: "label", text: "Sells to" }));
+    } else if (cat === "learn") {
+      info = [field("Can teach you", p.learn.teaches)];
+    } else if (cat === "teach") {
+      info = [field("Wants help with", p.teach.wants)];
+    } else {
+      info = [field("Good to know", p.connect.line)];
+    }
+    var others = p.cats.filter(function (k) { return k !== cat; });
+
+    var card = el("div", { class: "card enter" }, [
+      el("div", { class: "profile-head" }, [
+        el("div", { class: "avatar", text: p.short }),
+        el("div", {}, [el("h2", { text: p.name }), el("div", { class: "muted small", text: p.does })])
+      ]),
+      el("div", { class: "row" }, [el("span", { class: "chip tag", text: "Open to: " + CATS[cat].label })].concat(others.map(function (k) { return el("span", { class: "chip", text: CATS[k].label }); })))
+    ].concat(info));
+
+    if (p.photo) card.insertBefore(el("img", { class: "card-photo", src: p.photo, alt: "Photo from " + p.name, draggable: "false" }), card.children[1]);
+    if (state.composing === p.id) {
+      var ta = el("textarea", { id: "note", rows: "3", maxlength: "200", placeholder: "Say hello and what you'd like to talk about. Max 200 characters.", "aria-label": "Your one message" });
+      ta.value = state.draft;
+      var count = el("span", { class: "muted small", id: "count", text: (200 - state.draft.length) + " left" });
+      ta.addEventListener("input", function () { state.draft = ta.value; count.textContent = (200 - ta.value.length) + " left"; });
+      card.appendChild(el("div", { class: "sec" }, [
+        el("div", { class: "label", text: "Your one message" }),
+        el("p", { class: "hint", text: "You can send one message before they accept. After that you can chat freely." }),
+        ta,
+        el("div", { class: "row between" }, [count, el("div", { class: "row" }, [
+          el("button", { class: "btn sm", onclick: function () { state.composing = null; render(); } }, ["Cancel"]),
+          el("button", { class: "btn sm yes", onclick: function () {
+            var t = state.draft.trim(); if (!t) return;
+            state.requested.push({ id: p.id, name: p.name, short: p.short, cat: cat, msg: t });
+            markSeen(p, cat); state.composing = null; state.draft = ""; state.matchNote = null; render();
+          } }, ["Send request"])
+        ])])
+      ]));
+    } else {
+      var decided = false;
+      var stampYes = el("div", { class: "stamp yes", "aria-hidden": "true", text: "YES, PARTNER UP" });
+      var stampNo = el("div", { class: "stamp no", "aria-hidden": "true", text: "PASS" });
+      card.classList.add("swipeable");
+      card.appendChild(stampYes);
+      card.appendChild(stampNo);
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var finish = function (yes) {
+        if (decided) return;
+        decided = true;
+        var run = function () {
+          markSeen(p, cat);
+          if (yes && p.likesYou) { connect(p, cat); state.matchNote = { name: p.name, step: p[cat].step }; } else { state.matchNote = null; }
+          render();
+        };
+        if (reduce) { run(); return; }
+        card.classList.remove("enter");
+        card.style.transition = "transform .22s ease, opacity .22s ease";
+        card.style.transform = "translateX(" + (yes ? 520 : -520) + "px) rotate(" + (yes ? 18 : -18) + "deg)";
+        card.style.opacity = "0";
+        setTimeout(run, 220);
+      };
+      var startX = 0, dx = 0, dragging = false;
+      card.addEventListener("pointerdown", function (e) {
+        if (decided || e.target.closest("button, a, textarea, input, select")) return;
+        dragging = true; startX = e.clientX; dx = 0;
+        card.classList.remove("enter");
+        card.style.transition = "none";
+        try { card.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      card.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        dx = e.clientX - startX;
+        card.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 25) + "deg)";
+        var a = Math.min(1, Math.abs(dx) / 110);
+        stampYes.style.opacity = dx > 0 ? a : 0;
+        stampNo.style.opacity = dx < 0 ? a : 0;
+        card.style.borderColor = Math.abs(dx) > 40 ? (dx > 0 ? "var(--good)" : "var(--bad)") : "";
+      });
+      var endDrag = function () {
+        if (!dragging) return;
+        dragging = false;
+        if (Math.abs(dx) > 110) { finish(dx > 0); return; }
+        card.style.transition = "transform .2s ease";
+        card.style.transform = "";
+        card.style.borderColor = "";
+        stampYes.style.opacity = 0; stampNo.style.opacity = 0;
+      };
+      card.addEventListener("pointerup", endDrag);
+      card.addEventListener("pointercancel", endDrag);
+      card.appendChild(el("div", { class: "swipe" }, [
+        el("button", { class: "btn", onclick: function () { finish(false); } }, ["← Pass"]),
+        el("button", { class: "btn yes", onclick: function () { finish(true); } }, ["Partner up →"])
+      ]));
+      card.appendChild(el("button", { class: "btn", onclick: function () { state.composing = p.id; state.draft = ""; render(); } }, ["Send a message request"]));
+    }
+    if (state.composing !== p.id) frag.appendChild(el("p", { class: "swipe-hint" }, [el("span", { class: "sl", text: "← Swipe left to pass" }), el("span", { class: "sr", text: "Swipe right to partner up →" })]));
+    frag.appendChild(card);
+    frag.appendChild(el("p", { class: "hint", text: d.length + (d.length === 1 ? " profile" : " profiles") + " left in " + CATS[state.cat].label }));
+    return frag;
+  }
+
+  /* ---------- Network tab ---------- */
+  function sectionTitle(text, n) { return el("div", { class: "row between" }, [el("h3", { text: text }), el("span", { class: "muted small", text: String(n) })]); }
+
+  function networkView() {
+    var frag = document.createDocumentFragment();
+    var nf = state.nf;
+    function vis(x) { return nf === "all" || x.cat === nf; }
+    var incV = state.incoming.filter(vis), reqV = state.requested.filter(vis), conV = state.connected.filter(vis);
+    frag.appendChild(el("div", { class: "cats" }, [
+      el("div", { class: "label", text: "Show" }),
+      el("div", { class: "cat-row" }, ["all"].concat(ORDER).map(function (k) {
+        return el("button", { "aria-pressed": String(nf === k), onclick: function () { state.nf = k; render(); } }, [CATS[k].label]);
+      }))
+    ]));
+
+    var inc = el("div", { class: "card" }, [sectionTitle("Requests to you", incV.length)]);
+    if (!incV.length) inc.appendChild(el("div", { class: "muted small", text: "No pending requests." }));
+    var incList = el("div", { class: "list" });
+    incV.forEach(function (r) {
+      incList.appendChild(el("div", { class: "item enter" }, [
+        el("div", { class: "who" }, [el("div", { class: "avatar sm", text: r.short }), el("div", {}, [el("b", { text: r.name }), el("div", { class: "row" }, [el("span", { class: "chip tag", text: CATS[r.cat].label })])])]),
+        el("div", { class: "quote", text: r.msg }),
+        el("div", { class: "row" }, [
+          el("button", { class: "btn sm yes", onclick: function () {
+            state.incoming = state.incoming.filter(function (x) { return x !== r; });
+            state.connected.push({ id: r.id, name: r.name, short: r.short, cat: r.cat, thread: [{ from: "them", text: r.msg }], intro: false, sale: false });
+            state.open = r.id; render();
+          } }, ["Accept"]),
+          el("button", { class: "btn sm", onclick: function () { state.incoming = state.incoming.filter(function (x) { return x !== r; }); render(); } }, ["Decline"])
+        ])
+      ]));
+    });
+    if (incV.length) inc.appendChild(incList);
+    frag.appendChild(inc);
+
+    var req = el("div", { class: "card" }, [sectionTitle("Requested", reqV.length)]);
+    if (!reqV.length) req.appendChild(el("div", { class: "muted small", text: "Send a message request from the Match tab. You get one message until they accept." }));
+    var reqList = el("div", { class: "list" });
+    reqV.forEach(function (r) {
+      reqList.appendChild(el("div", { class: "item" }, [
+        el("div", { class: "who" }, [el("div", { class: "avatar sm", text: r.short }), el("div", {}, [el("b", { text: r.name }), el("div", { class: "row" }, [el("span", { class: "chip tag", text: CATS[r.cat].label }), el("span", { class: "muted small", text: "Waiting for a reply" })])])]),
+        el("div", { class: "quote", text: "You: " + r.msg }),
+        el("button", { class: "btn sm", onclick: function () {
+          state.requested = state.requested.filter(function (x) { return x !== r; });
+          state.connected.push({ id: r.id, name: r.name, short: r.short, cat: r.cat, thread: [{ from: "me", text: r.msg }, { from: "them", text: "Thanks for reaching out. Happy to chat, when suits you?" }], intro: false, sale: false });
+          state.open = r.id; render();
+        } }, ["Demo: simulate their reply"])
+      ]));
+    });
+    if (reqV.length) req.appendChild(reqList);
+    frag.appendChild(req);
+
+    var con = el("div", { class: "card" }, [sectionTitle("Connected", conV.length)]);
+    if (!conV.length) con.appendChild(el("div", { class: "muted small", text: "Mutual matches and accepted requests appear here." }));
+    var conList = el("div", { class: "list" });
+    conV.forEach(function (c) {
+      var isOpen = state.open === c.id;
+      var item = el("div", { class: "item" }, [
+        el("div", { class: "row between" }, [
+          el("div", { class: "who" }, [el("div", { class: "avatar sm", text: c.short }), el("div", {}, [el("b", { text: c.name }), el("div", {}, [el("span", { class: "chip tag", text: CATS[c.cat].label })])])]),
+          el("button", { class: "btn sm", onclick: function () { state.open = isOpen ? null : c.id; render(); } }, [isOpen ? "Close chat" : "Open chat"])
+        ])
+      ]);
+      if (c.cat === "collab") {
+        item.appendChild(el("div", { class: "row" }, [
+          el("button", { class: "btn sm" + (c.intro ? " done" : ""), onclick: function () { c.intro = true; render(); } }, [c.intro ? "Introduction made" : "Mark introduction made"]),
+          c.intro ? el("button", { class: "btn sm" + (c.sale ? " done" : ""), onclick: function () { c.sale = true; render(); } }, [c.sale ? "Sale recorded" : "Record a sale"]) : null
+        ]));
+      }
+      if (isOpen) {
+        var th = el("div", { class: "thread enter" }, c.thread.map(function (m) { return el("div", { class: "msg" + (m.from === "me" ? " me" : ""), text: m.text }); }));
+        if (!c.thread.length) th.appendChild(el("div", { class: "muted small", text: "You're connected. Say hello." }));
+        item.appendChild(th);
+        var box = el("textarea", { id: "chat", rows: "2", placeholder: "Write a message", "aria-label": "Message" });
+        item.appendChild(box);
+        item.appendChild(el("button", { class: "btn sm yes", onclick: function () {
+          var t = box.value.trim(); if (!t) return; c.thread.push({ from: "me", text: t }); render();
+        } }, ["Send"]));
+      }
+      conList.appendChild(item);
+    });
+    if (conV.length) con.appendChild(conList);
+    frag.appendChild(con);
+    return frag;
+  }
+
+  /* ---------- Profile tab ---------- */
+  function initials(name) {
+    var w = (name || "").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean);
+    return ((w[0] || "?").charAt(0) + (w[1] ? w[1].charAt(0) : "")).toUpperCase();
+  }
+  var SOCIALS = [
+    { key: "website", label: "Website", ph: "yourbusiness.co.uk" },
+    { key: "linkedin", label: "LinkedIn", ph: "linkedin.com/company/yourbusiness" },
+    { key: "instagram", label: "Instagram", ph: "@yourbusiness" },
+    { key: "x", label: "X", ph: "@yourbusiness" }
+  ];
+  function socialUrl(key, raw) {
+    var v = (raw || "").trim();
+    if (!v) return null;
+    var url = v;
+    if (!/^https?:\/\//i.test(v)) {
+      var handle = v.charAt(0) === "@" || (v.indexOf(".") === -1 && v.indexOf("/") === -1);
+      var h = v.replace(/^@/, "");
+      if (handle && key === "instagram") url = "https://www.instagram.com/" + h;
+      else if (handle && key === "x") url = "https://x.com/" + h;
+      else if (handle && key === "linkedin") url = "https://www.linkedin.com/company/" + h;
+      else url = "https://" + v;
+    }
+    try { var u = new URL(url); return (u.protocol === "https:" || u.protocol === "http:") ? u.href : null; } catch (e) { return null; }
+  }
+  function previewCard(p, pub) {
+    var hosted = (!pub || p.isMe) ? CIRCLES.filter(function (c) { return c.mine; }).map(function (c) { return c.name; }) : [];
+    var links = SOCIALS.map(function (s) {
+      var u = socialUrl(s.key, p[s.key]);
+      return u ? el("a", { href: u, target: "_blank", rel: "noopener noreferrer", text: s.label }) : null;
+    }).filter(Boolean);
+    var custs = (p.customers || "").split(",").map(function (t) { return t.trim(); }).filter(Boolean);
+    return el("div", { class: "card" }, [
+      el("div", { class: "label", text: pub ? "Business profile" : "How other founders see you" }),
+      el("div", { class: "profile-head" }, [el("div", { class: "avatar", text: initials(p.name) }), el("div", {}, [el("h2", { text: p.name || "Your business" }), el("div", { class: "muted small", text: p.sector || (pub ? "Alumni business" : "Your sector") })])]),
+      el("div", { class: p.description ? "" : "muted", text: p.description || "Add a short description of what you do." }),
+      (p.photos && p.photos.length) ? el("div", { class: "gallery" }, p.photos.map(function (src, i) { return el("img", { src: src, alt: "Photo " + (i + 1) + " from " + (p.name || "this business"), draggable: "false" }); })) : null,
+      custs.length ? el("div", {}, [el("div", { class: "label", text: "Sells to" }), chips(custs)]) : null,
+      p.offers ? field("Offers", p.offers) : null,
+      p.wants ? field("Looking for", p.wants) : null,
+      hosted.length ? el("div", {}, [el("div", { class: "label", text: "Circles hosted" }), chips(hosted)]) : null,
+      links.length ? el("div", {}, [el("div", { class: "label", text: "Find us online" }), el("div", { class: "row socials" }, links)]) : el("div", { class: "muted small", text: "No socials added yet." }),
+      pub ? null : el("p", { class: "hint", text: "Your socials are shown only to founders you're connected with." })
+    ]);
+  }
+  function profileView() {
+    var frag = document.createDocumentFragment();
+    var p0 = state.profile, inputs = {};
+    var previewBox = el("div", {}, [previewCard(p0)]);
+    function gather() { var o = {}; Object.keys(inputs).forEach(function (k) { o[k] = inputs[k].value; }); o.photos = p0.photos; return o; }
+    function refresh() { previewBox.textContent = ""; previewBox.appendChild(previewCard(gather())); }
+    function fld(key, label, ph, area) {
+      var inp = area ? el("textarea", { id: "pf-" + key, rows: "3", maxlength: "300", placeholder: ph }) : el("input", { type: "text", id: "pf-" + key, placeholder: ph, autocomplete: "off", maxlength: "120" });
+      inp.value = p0[key] || ""; inp.addEventListener("input", refresh); inputs[key] = inp;
+      return el("div", { class: "field" }, [el("label", { for: "pf-" + key, text: label }), inp]);
+    }
+    var photos = p0.photos;
+    var thumbs = el("div", { class: "gallery" });
+    var photoMsg = el("p", { class: "hint", text: "" });
+    var fileInput = el("input", { type: "file", id: "pf-file", accept: "image/*", multiple: "multiple", "aria-label": "Add photos" });
+    function drawPhotos() {
+      thumbs.textContent = "";
+      photos.forEach(function (src, i) {
+        thumbs.appendChild(el("div", { class: "thumb" }, [
+          el("img", { src: src, alt: "Photo " + (i + 1) }),
+          el("button", { class: "btn sm", type: "button", onclick: function () { photos.splice(i, 1); drawPhotos(); refresh(); } }, ["Remove"])
+        ]));
+      });
+      fileInput.disabled = photos.length >= 3;
+    }
+    function note(t) { photoMsg.textContent = t; }
+    function addPhotoFile(file) {
+      if (photos.length >= 3) { note("That's the maximum of 3 photos."); return; }
+      if (!file || file.type.indexOf("image/") !== 0) { note("Please choose an image file."); return; }
+      var r = new FileReader();
+      r.onerror = function () { note("That file couldn't be read."); };
+      r.onload = function () {
+        var img = new Image();
+        img.onerror = function () { note("That file couldn't be read as an image."); };
+        img.onload = function () {
+          var sc = Math.min(1, 800 / Math.max(img.width, img.height, 1));
+          var c = document.createElement("canvas");
+          c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc));
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          if (photos.length < 3) photos.push(c.toDataURL("image/jpeg", 0.8));
+          note(""); drawPhotos(); refresh();
+        };
+        img.src = r.result;
+      };
+      r.readAsDataURL(file);
+    }
+    fileInput.addEventListener("change", function () {
+      Array.prototype.slice.call(fileInput.files || [], 0, 3).forEach(addPhotoFile);
+      fileInput.value = "";
+    });
+    var photoSection = el("div", { class: "field" }, [
+      el("div", { class: "label", text: "Photos (optional, up to 3)" }),
+      thumbs,
+      fileInput,
+      el("div", { class: "row" }, [el("span", { class: "muted small", text: "Or try an example:" })].concat(SAMPLES.map(function (sm) {
+        return el("button", { class: "btn sm", type: "button", onclick: function () {
+          if (photos.length >= 3) { note("That's the maximum of 3 photos."); return; }
+          photos.push(sm.src); note(""); drawPhotos(); refresh();
+        } }, [sm.label]);
+      }))),
+      photoMsg,
+      el("p", { class: "hint", text: "Photos stay in your browser in this demo." })
+    ]);
+    drawPhotos();
+    var hostSection = el("div", { class: "field" }, [
+      el("div", { class: "label", text: "Circles you host" }),
+      el("div", { class: "muted small", id: "host-list", text: CIRCLES.some(function (c) { return c.mine; }) ? CIRCLES.filter(function (c) { return c.mine; }).map(function (c) { return c.name; }).join(", ") : "You haven't created a circle yet." }),
+      el("button", { class: "btn sm", type: "button", onclick: function () {
+        var o = gather(); if (!o.name.trim()) o.name = p0.name;
+        state.profile = o; state.tab = "circles"; state.circleForm = true; setHash(); render();
+      } }, ["+ Create a circle"])
+    ]);
+    var form = el("form", { class: "card", id: "profile-form", onsubmit: function (e) {
+      e.preventDefault();
+      var o = gather();
+      if (!o.name.trim()) o.name = p0.name;
+      state.profile = o; state.profileSaved = true; render();
+    } }, [
+      el("h2", { text: "My profile" }),
+      el("p", { class: "hint", text: "This is what matches see before they say yes." }),
+      fld("name", "Business name", "Your business"),
+      fld("sector", "Sector", "e.g. Finance and bookkeeping"),
+      fld("description", "Description (up to 300 characters)", "What you do, who you help and what makes you different", true),
+      fld("customers", "Who you sell to (separate with commas)", "Local shops, Cafés, Startups"),
+      fld("offers", "What you can offer other founders", "e.g. a discount for referred customers"),
+      fld("wants", "What you're looking for", "e.g. introductions to web designers"),
+      photoSection,
+      hostSection,
+      el("div", { class: "label", text: "Socials (optional)" })
+    ].concat(SOCIALS.map(function (s) { return fld(s.key, s.label, s.ph); })).concat([
+      state.profileSaved ? el("div", { class: "notice enter" }, [el("b", { text: "Profile saved" }), el("div", { class: "small", text: "Your matches will see the updated version." })]) : null,
+      el("button", { class: "btn yes", type: "submit" }, ["Save profile"])
+    ]));
+    frag.appendChild(form);
+    frag.appendChild(previewBox);
+    return frag;
+  }
+
+  /* ---------- Circles tab ---------- */
+  var CIRCLES = [
+    { id: 1, name: "Service Businesses Circle", format: "In person", when: "Thu 11 Dec · 6:00 pm", where: "Generator Ancoats (example)", total: 6, taken: 4, stage: "1 to 3 years in", goals: ["collab", "connect"],
+      keywords: ["bookkeep", "financ", "design", "web", "event", "insurance", "consult", "service"],
+      focus: ["Referrals", "Pricing", "Joint offers"], members: ["Design", "Web", "Events", "Insurance"], host: "MEC team",
+      about: "For founders who sell a service to other small businesses. Each person shares one ask and one offer, and matched pairs report back on introductions." },
+    { id: 2, name: "Food & Hospitality Breakfast", format: "In person", when: "Tue 9 Dec · 8:00 am", where: "Northern Quarter café (example)", total: 6, taken: 3, stage: "Any stage", goals: ["collab", "connect"],
+      keywords: ["café", "cafe", "food", "cater", "restaurant", "bakery", "coffee"],
+      focus: ["Suppliers", "Staffing", "Footfall"], members: ["Catering", "Café", "Bakery"], host: "Alumni host",
+      about: "An early start before the lunch rush. Swap supplier tips, cover shifts and plan joint events with other food businesses." },
+    { id: 3, name: "First-Year Founders", format: "Online", when: "Wed 10 Dec · 7:00 pm", where: "Video call, link sent after joining", total: 8, taken: 5, stage: "Under 1 year", goals: ["learn", "connect"],
+      keywords: [],
+      focus: ["First customers", "Pricing", "Confidence"], members: ["Fitness", "Tutoring", "Photography", "Retail"], host: "MEC team",
+      about: "A friendly group for people still finding their feet. Short check-ins, plenty of questions, and an experienced alumni guest each month." },
+    { id: 4, name: "Growth & Hiring Circle", format: "In person", when: "Mon 15 Dec · 12:30 pm", where: "Salford Quays (example)", total: 6, taken: 3, stage: "3+ years in", goals: ["teach", "learn"],
+      keywords: ["hiring", "staff", "team", "scale", "grow"],
+      focus: ["Hiring", "Systems", "Scaling"], members: ["Catering", "Agency", "Manufacturing"], host: "Alumni host",
+      about: "For founders with a small team. Compare notes on hiring and keeping quality as you grow, and mentor newer founders who drop in." },
+    { id: 5, name: "Makers & Online Sellers", format: "Online", when: "Thu 18 Dec · 8:00 pm", where: "Video call, link sent after joining", total: 8, taken: 8, stage: "Any stage", goals: ["collab", "learn"],
+      keywords: ["retail", "shop", "maker", "online", "craft", "ecommerce"],
+      focus: ["Marketplaces", "Shipping", "Social media"], members: ["Crafts", "Print", "Clothing", "Gifts"], host: "Alumni host",
+      about: "Selling products online. Share what works on marketplaces and social media, and split the cost of shipping and packaging." },
+    { id: 6, name: "Open Coffee", format: "In person", when: "Sat 13 Dec · 10:00 am", where: "Ancoats coffee shop (example)", total: 8, taken: 3, stage: "Any stage", goals: ["connect"],
+      keywords: [],
+      focus: ["Meeting people", "No agenda"], members: ["Mixed fields"], host: "MEC team",
+      about: "No agenda and no pitching. Just a relaxed way to meet other alumni and see whether you'd like to go to a regular circle." }
+  ];
+
+  function fmtWhen(v) {
+    if (!v) return "Date to be confirmed";
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return "Date to be confirmed";
+    return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) + " · " + d.toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+  }
+  function circleForm() {
+    var ids = {};
+    function inp(key, label, ph, type) {
+      var i = el("input", { type: type || "text", id: "cc-" + key, placeholder: ph || "", maxlength: "80", autocomplete: "off" });
+      ids[key] = i;
+      return el("div", { class: "field" }, [el("label", { for: "cc-" + key, text: label }), i]);
+    }
+    function sel(key, label, opts) {
+      var s2 = el("select", { id: "cc-" + key }, opts.map(function (o) { return el("option", { value: o, text: o }); }));
+      ids[key] = s2;
+      return el("div", { class: "field" }, [el("label", { for: "cc-" + key, text: label }), s2]);
+    }
+    var about = el("textarea", { id: "cc-about", rows: "3", maxlength: "300", placeholder: "What will the group do, and who is it for?" });
+    var boxes = ORDER.map(function (k) {
+      var cb = el("input", { type: "checkbox", id: "cc-g-" + k, value: k });
+      if (k === "connect") cb.checked = true;
+      return { k: k, cb: cb };
+    });
+    var err = el("p", { class: "hint", text: "" });
+    return el("form", { class: "card enter", id: "circle-form", onsubmit: function (e) {
+      e.preventDefault();
+      var name = ids.name.value.trim();
+      var goals = boxes.filter(function (b) { return b.cb.checked; }).map(function (b) { return b.k; });
+      if (!name) { err.textContent = "Give your circle a name."; return; }
+      if (!goals.length) { err.textContent = "Pick at least one goal."; return; }
+      var format = ids.format.value;
+      var where = ids.where.value.trim() || (format === "Online" ? "Video call, link sent after joining" : "Venue to be confirmed");
+      var focus = ids.focus.value.split(",").map(function (t) { return t.trim(); }).filter(Boolean).slice(0, 4);
+      var c = {
+        id: Date.now(), mine: true, name: name, format: format, when: fmtWhen(ids.when.value), where: where,
+        total: parseInt(ids.total.value, 10), taken: 0, stage: ids.stage.value, goals: goals, keywords: [],
+        focus: focus.length ? focus : ["Open conversation"], members: [state.profile.sector || "You"],
+        host: state.profile.name + " (you)", about: about.value.trim() || "A new circle started by an alumni founder."
+      };
+      CIRCLES.unshift(c);
+      state.joined[c.id] = "going"; state.copen = c.id; state.circleForm = false; state.cf = { format: "all", goal: "all" };
+      render();
+    } }, [
+      el("h2", { text: "Create a circle" }),
+      el("p", { class: "hint", text: "A circle is a small group of 4 to 8 founders that meets for an hour. You'll be listed as the host." }),
+      inp("name", "Circle name", "e.g. Creative Freelancers Circle"),
+      sel("format", "Format", ["In person", "Online"]),
+      inp("when", "Date and time", "", "datetime-local"),
+      inp("where", "Where (leave blank for a default)", "e.g. Ancoats coffee shop"),
+      sel("total", "Spots", ["4", "5", "6", "7", "8"]),
+      sel("stage", "Best for", ["Any stage", "Under 1 year", "1 to 3 years in", "3+ years in"]),
+      el("div", {}, [el("div", { class: "label", text: "What is it for? (pick at least one)" }),
+        el("div", { class: "row" }, boxes.map(function (b) { return el("label", { class: "row small", for: "cc-g-" + b.k }, [b.cb, CATS[b.k].label]); }))]),
+      inp("focus", "Topics (separate with commas)", "e.g. Pricing, Referrals"),
+      el("div", { class: "field" }, [el("label", { for: "cc-about", text: "About (up to 300 characters)" }), about]),
+      err,
+      el("div", { class: "row" }, [
+        el("button", { class: "btn yes", type: "submit" }, ["Create circle"]),
+        el("button", { class: "btn", type: "button", onclick: function () { state.circleForm = false; render(); } }, ["Cancel"])
+      ])
+    ]);
+  }
+
+  function circleFit(c) {
+    var text = ((state.profile.sector || "") + " " + (state.profile.customers || "") + " " + (state.profile.description || "")).toLowerCase();
+    var hits = c.keywords.filter(function (k) { return text.indexOf(k) > -1; }).length;
+    var goal = c.goals.indexOf(state.cat) > -1;
+    var reasons = [];
+    if (hits) reasons.push("Matches your sector");
+    if (goal) reasons.push("Fits what you want: " + CATS[state.cat].label);
+    return { score: Math.min(hits, 2) + (goal ? 1 : 0), reasons: reasons };
+  }
+
+  function circlesView() {
+    var frag = document.createDocumentFragment();
+    var cf = state.cf;
+    if (state.circleForm) frag.appendChild(circleForm());
+    else frag.appendChild(el("button", { class: "btn yes", onclick: function () { state.circleForm = true; render(); } }, ["+ Create your own circle"]));
+    function filterRow(label, key, options) {
+      return el("div", { class: "row" }, [el("span", { class: "label", text: label })].concat(options.map(function (o) {
+        return el("button", { class: "btn sm", "aria-pressed": String(cf[key] === o[0]), onclick: function () { cf[key] = o[0]; render(); } }, [o[1]]);
+      })));
+    }
+    frag.appendChild(el("div", { class: "cats" }, [
+      el("div", { class: "label", text: "Find a circle that fits" }),
+      el("p", { class: "hint", text: "Small groups of 5 to 8 founders that meet for an hour each month. Sorted by how well they fit your profile and what you picked on the Match tab (" + CATS[state.cat].label + ")." }),
+      filterRow("Format", "format", [["all", "All"], ["In person", "In person"], ["Online", "Online"]]),
+      filterRow("Goal", "goal", [["all", "All"], ["connect", "Connect"], ["collab", "Collab"], ["learn", "Learn"], ["teach", "Teach"]])
+    ]));
+
+    var going = CIRCLES.filter(function (c) { return state.joined[c.id] === "going"; });
+    if (going.length) {
+      frag.appendChild(el("div", { class: "notice enter" }, [
+        el("b", { text: "Your circles (" + going.length + ")" }),
+        el("div", { class: "small", text: going.map(function (c) { return c.name + ", " + c.when; }).join(" · ") })
+      ]));
+    }
+
+    var rows = CIRCLES.filter(function (c) {
+      return (cf.format === "all" || c.format === cf.format) && (cf.goal === "all" || c.goals.indexOf(cf.goal) > -1);
+    }).map(function (c) { return { c: c, fit: circleFit(c) }; })
+      .sort(function (a, b) { return b.fit.score - a.fit.score || a.c.id - b.c.id; });
+
+    if (!rows.length) frag.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "No circles match those filters. Try All." })]));
+
+    rows.forEach(function (r) {
+      var c = r.c, st = state.joined[c.id], isOpen = state.copen === c.id;
+      var full = c.total - c.taken <= 0;
+      var left = c.total - c.taken - (st === "going" ? 1 : 0);
+      var joinLabel = st === "going" ? (c.mine ? "You're hosting (tap to step out)" : "You're going (tap to leave)") : st === "waitlist" ? "On the waitlist (tap to leave)" : full ? "Join waitlist" : "Join this circle";
+      var card = el("div", { class: "card enter" }, [
+        el("div", { class: "row between" }, [el("h3", { text: c.name }), r.fit.score >= 2 ? el("span", { class: "chip tag", text: "Good fit" }) : r.fit.score === 1 ? el("span", { class: "chip", text: "Possible fit" }) : null]),
+        el("div", { class: "row" }, [c.mine ? el("span", { class: "chip tag", text: "Hosted by you" }) : null, el("span", { class: "chip", text: c.format }), el("span", { class: "chip", text: c.stage })].concat(c.goals.map(function (g) { return el("span", { class: "chip", text: CATS[g].label }); }))),
+        el("div", {}, [el("div", { text: c.when }), el("div", { class: "muted small", text: c.where })]),
+        r.fit.reasons.length ? el("div", { class: "small", text: r.fit.reasons.join(" · ") }) : null,
+        el("div", { class: "muted small", text: full && !st ? "Full. Join the waitlist for a spot." : (left + " of " + c.total + " spots left") })
+      ]);
+      if (isOpen) {
+        card.appendChild(el("div", { class: "sec enter" }, [
+          el("div", { class: "small", text: c.about }),
+          el("div", {}, [el("div", { class: "label", text: "What they talk about" }), chips(c.focus)]),
+          el("div", {}, [el("div", { class: "label", text: "Who's in it" }), chips(c.members)]),
+          el("div", { class: "muted small", text: "Hosted by: " + c.host + ". The agenda comes from unanswered asks on the Board." })
+        ]));
+      }
+      card.appendChild(el("div", { class: "row" }, [
+        el("button", { class: "btn sm" + (st ? " done" : " yes"), onclick: function () {
+          if (st) delete state.joined[c.id]; else state.joined[c.id] = full ? "waitlist" : "going";
+          render();
+        } }, [joinLabel]),
+        el("button", { class: "btn sm", onclick: function () { state.copen = isOpen ? null : c.id; render(); } }, [isOpen ? "Hide details" : "See details"]),
+        c.mine ? el("button", { class: "btn sm", onclick: function () { CIRCLES = CIRCLES.filter(function (x) { return x.id !== c.id; }); delete state.joined[c.id]; if (state.copen === c.id) state.copen = null; render(); } }, ["Delete circle"]) : null
+      ]));
+      frag.appendChild(card);
+    });
+    return frag;
+  }
+
+  /* ---------- Market tab ---------- */
+  var AD_CATS = ["Services", "Food", "Wellbeing", "Products", "Other"];
+  var LISTINGS = [
+    { id: 1, biz: 1, title: "Logo and brand starter pack", cat: "Services", offer: "From £350 · 10% off for alumni", text: "A logo, colour palette and social media kit for new shops and cafés, delivered in two weeks.", photo: IMG_BRAND, age: "2d" },
+    { id: 2, biz: 6, title: "Office lunch platters", cat: "Food", offer: "From £8 a head · free delivery in Ancoats", text: "Fresh sandwich and salad platters for team lunches and meetings. Vegetarian and vegan options.", photo: IMG_FOOD, age: "3d" },
+    { id: 3, biz: 2, title: "Free insurance check for new traders", cat: "Services", offer: "Free 20-minute review", text: "We'll look at what cover you actually need and what you can skip. No sales pressure.", photo: null, age: "4d" },
+    { id: 4, biz: 4, title: "One-page website in a week", cat: "Services", offer: "£450 fixed price", text: "A clean, mobile-friendly page with your contact details, photos and a booking button.", photo: null, age: "5d" },
+    { id: 5, biz: 5, title: "Small-group sessions for busy founders", cat: "Wellbeing", offer: "First session free", text: "Lunchtime strength and mobility classes, six people at most, near Ancoats.", photo: null, age: "6d" }
+  ];
+  var REVIEWS = {
+    1: [{ stars: 5, text: "Fast, friendly and the logo looks great. They listened to what we wanted.", by: "Loop Events", when: "3 weeks ago" },
+        { stars: 4, text: "Good communication and a clear process. One round of changes took a little longer than promised.", by: "Mill Street Insurance", when: "1 month ago" }],
+    4: [{ stars: 4, text: "Simple site, delivered on time. Easy to update afterwards.", by: "Harbour Street Catering", when: "2 weeks ago" }],
+    6: [{ stars: 5, text: "Catered our launch. Everyone asked who the caterer was.", by: "PixelPatch Web Design", when: "1 week ago" }]
+  };
+
+  function bizName(id) { return id === "me" ? state.profile.name : (byId(id) || { name: "Unknown" }).name; }
+  function bizShort(id) { return id === "me" ? initials(state.profile.name) : (byId(id) || { short: "?" }).short; }
+  function bizProfile(id) {
+    if (id === "me") { var o = Object.assign({}, state.profile); o.isMe = true; return o; }
+    var p = byId(id);
+    if (!p) return null;
+    var c = p.collab || {};
+    return { name: p.name, sector: "", description: p.does, customers: (c.customers || []).join(", "), offers: c.offers || "", wants: c.wants || "", website: "", linkedin: "", instagram: "", x: "", photos: p.photo ? [p.photo] : [] };
+  }
+  function starsEl(n) {
+    return el("span", { class: "stars", role: "img", "aria-label": n + " out of 5 stars" }, [
+      el("span", { text: new Array(n + 1).join("★") }),
+      el("span", { class: "off", text: new Array(6 - n).join("★") })
+    ]);
+  }
+  function avgOf(id) {
+    var l = REVIEWS[id] || [];
+    return l.length ? l.reduce(function (a, r) { return a + r.stars; }, 0) / l.length : 0;
+  }
+  function ratingLine(id) {
+    var l = REVIEWS[id] || [];
+    if (!l.length) return el("span", { class: "muted small", text: "No reviews yet" });
+    return el("span", { class: "row" }, [starsEl(Math.round(avgOf(id))), el("b", { class: "small", text: avgOf(id).toFixed(1) }), el("span", { class: "muted small", text: "(" + l.length + ")" })]);
+  }
+  function readPhoto(file, ok, fail) {
+    if (!file || file.type.indexOf("image/") !== 0) { fail("Please choose an image file."); return; }
+    var r = new FileReader();
+    r.onerror = function () { fail("That file couldn't be read."); };
+    r.onload = function () {
+      var img = new Image();
+      img.onerror = function () { fail("That file couldn't be read as an image."); };
+      img.onload = function () {
+        var sc = Math.min(1, 800 / Math.max(img.width, img.height, 1));
+        var c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        ok(c.toDataURL("image/jpeg", 0.8));
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+
+  function adForm() {
+    var ids = {}, adPhoto = null;
+    function inp(key, label, ph) {
+      var i = el("input", { type: "text", id: "ad-" + key, placeholder: ph || "", maxlength: "80", autocomplete: "off" });
+      ids[key] = i;
+      return el("div", { class: "field" }, [el("label", { for: "ad-" + key, text: label }), i]);
+    }
+    var cat = el("select", { id: "ad-cat" }, AD_CATS.map(function (c) { return el("option", { value: c, text: c }); }));
+    var text = el("textarea", { id: "ad-text", rows: "3", maxlength: "300", placeholder: "What do you sell, who is it for, and why should people choose you?" });
+    var err = el("p", { class: "hint", text: "" });
+    var thumb = el("div", { class: "sec" });
+    function showThumb() {
+      thumb.textContent = "";
+      if (!adPhoto) return;
+      thumb.appendChild(el("img", { class: "card-photo", src: adPhoto, alt: "Preview of your ad photo" }));
+      thumb.appendChild(el("button", { class: "btn sm", type: "button", onclick: function () { adPhoto = null; showThumb(); } }, ["Remove photo"]));
+    }
+    var file = el("input", { type: "file", id: "ad-file", accept: "image/*", "aria-label": "Add a photo to your ad" });
+    file.addEventListener("change", function () {
+      readPhoto(file.files && file.files[0], function (d) { adPhoto = d; err.textContent = ""; showThumb(); }, function (m) { err.textContent = m; });
+      file.value = "";
+    });
+    return el("form", { class: "card enter", id: "ad-form", onsubmit: function (e) {
+      e.preventDefault();
+      var title = ids.title.value.trim();
+      if (!title) { err.textContent = "Give your ad a title."; return; }
+      LISTINGS.unshift({ id: Date.now(), biz: "me", title: title, cat: cat.value, offer: ids.offer.value.trim(), text: text.value.trim() || "No description yet.", photo: adPhoto, age: "now" });
+      state.adForm = false; state.mf = "all"; render();
+    } }, [
+      el("h2", { text: "Post an ad" }),
+      el("p", { class: "hint", text: "Your ad appears in the marketplace under your business name." }),
+      inp("title", "Title", "e.g. Monthly bookkeeping for small shops"),
+      el("div", { class: "field" }, [el("label", { for: "ad-cat", text: "Category" }), cat]),
+      inp("offer", "Price or offer (optional)", "e.g. From £50 a month · first month free"),
+      el("div", { class: "field" }, [el("label", { for: "ad-text", text: "Description (up to 300 characters)" }), text]),
+      el("div", { class: "field" }, [
+        el("div", { class: "label", text: "Photo (optional)" }), file,
+        el("div", { class: "row" }, [el("span", { class: "muted small", text: "Or try an example:" })].concat(SAMPLES.map(function (sm) {
+          return el("button", { class: "btn sm", type: "button", onclick: function () { adPhoto = sm.src; err.textContent = ""; showThumb(); } }, [sm.label]);
+        }))),
+        thumb
+      ]),
+      err,
+      el("div", { class: "row" }, [
+        el("button", { class: "btn yes", type: "submit" }, ["Post ad"]),
+        el("button", { class: "btn", type: "button", onclick: function () { state.adForm = false; render(); } }, ["Cancel"])
+      ])
+    ]);
+  }
+
+  function adCard(a, hideWho) {
+    var card = el("div", { class: "card enter" }, [
+      a.photo ? el("img", { class: "card-photo", src: a.photo, alt: a.title, draggable: "false" }) : null,
+      el("h3", { text: a.title }),
+      hideWho ? null : el("div", { class: "who" }, [
+        el("div", { class: "avatar sm", text: bizShort(a.biz) }),
+        el("div", {}, [el("button", { class: "link", onclick: function () { state.viewBiz = a.biz; render(); } }, [bizName(a.biz) + (a.biz === "me" ? " (you)" : "")]), el("div", {}, [ratingLine(a.biz)])])
+      ]),
+      el("div", { class: "row" }, [el("span", { class: "chip", text: a.cat })].concat(a.offer ? [el("span", { class: "chip tag", text: a.offer })] : []).concat([el("span", { class: "muted small", text: a.age })])),
+      el("div", { text: a.text }),
+      el("div", { class: "row" }, [
+        hideWho ? null : el("button", { class: "btn sm", onclick: function () { state.viewBiz = a.biz; render(); } }, ["View profile & reviews"]),
+        a.biz === "me" ? el("button", { class: "btn sm", onclick: function () { LISTINGS = LISTINGS.filter(function (x) { return x.id !== a.id; }); render(); } }, ["Delete ad"]) : null
+      ])
+    ]);
+    return card;
+  }
+
+  function reviewForm(id) {
+    var list = REVIEWS[id] || [];
+    var mine = list.filter(function (r) { return r.mine; })[0];
+    var rating = mine ? mine.stars : 0;
+    var ta = el("textarea", { id: "rv-text", rows: "3", maxlength: "300", placeholder: "Share what it was like to work with them. Be specific and fair." });
+    if (mine) ta.value = mine.text;
+    var msg = el("p", { class: "hint", text: "" });
+    var btns = [1, 2, 3, 4, 5].map(function (n) {
+      return el("button", { type: "button", class: "star", "aria-label": n + (n === 1 ? " star" : " stars"), text: "★", onclick: function () { rating = n; paint(); } });
+    });
+    function paint() {
+      btns.forEach(function (b, i) { b.className = "star" + (i < rating ? " on" : ""); b.setAttribute("aria-pressed", String(i + 1 === rating)); });
+    }
+    paint();
+    return el("form", { class: "sec", id: "review-form", onsubmit: function (e) {
+      e.preventDefault();
+      var t = ta.value.trim();
+      if (!rating) { msg.textContent = "Choose 1 to 5 stars."; return; }
+      if (t.length < 5) { msg.textContent = "Write a short review (at least 5 characters)."; return; }
+      var arr = (REVIEWS[id] = (REVIEWS[id] || []).filter(function (r) { return !r.mine; }));
+      arr.unshift({ stars: rating, text: t, by: state.profile.name, when: "just now", mine: true });
+      render();
+    } }, [
+      el("div", { class: "label", text: mine ? "Your review" : "Write a review" }),
+      el("div", { class: "row" }, btns),
+      ta, msg,
+      el("button", { class: "btn yes", type: "submit" }, [mine ? "Update review" : "Post review"])
+    ]);
+  }
+
+  function reviewsCard(id) {
+    var list = REVIEWS[id] || [];
+    var card = el("div", { class: "card" }, [
+      el("div", { class: "row between" }, [el("h3", { text: "Reviews" }), ratingLine(id)])
+    ]);
+    if (list.length) {
+      card.appendChild(el("div", { class: "list" }, list.map(function (r) {
+        return el("div", { class: "item" }, [
+          el("div", { class: "row between" }, [starsEl(r.stars), el("span", { class: "muted small", text: r.by + (r.mine ? " (you)" : "") + " · " + r.when })]),
+          el("div", { text: r.text }),
+          r.mine ? el("button", { class: "btn sm", onclick: function () { REVIEWS[id] = (REVIEWS[id] || []).filter(function (x) { return !x.mine; }); render(); } }, ["Delete my review"]) : null
+        ]);
+      })));
+    } else {
+      card.appendChild(el("div", { class: "muted small", text: id === "me" ? "No reviews yet. Other founders can review your business from here." : "No reviews yet. Be the first." }));
+    }
+    if (id === "me") card.appendChild(el("p", { class: "hint", text: "You can't review your own business." }));
+    else card.appendChild(reviewForm(id));
+    return card;
+  }
+
+  function bizView(id) {
+    var prof = bizProfile(id);
+    if (!prof) { state.viewBiz = null; return marketView(); }
+    var frag = document.createDocumentFragment();
+    frag.appendChild(el("button", { class: "btn sm", onclick: function () { state.viewBiz = null; render(); } }, ["← Back to the marketplace"]));
+    frag.appendChild(previewCard(prof, true));
+    var ads = LISTINGS.filter(function (a) { return a.biz === id; });
+    if (ads.length) {
+      frag.appendChild(el("h3", { text: "Ads from " + prof.name }));
+      ads.forEach(function (a) { frag.appendChild(adCard(a, true)); });
+    }
+    frag.appendChild(reviewsCard(id));
+    return frag;
+  }
+
+  function marketView() {
+    if (state.viewBiz !== null) return bizView(state.viewBiz);
+    var frag = document.createDocumentFragment();
+    frag.appendChild(el("p", { class: "hint", text: "Alumni businesses advertise here. Tap a business to read its reviews and leave your own." }));
+    if (state.adForm) frag.appendChild(adForm());
+    else frag.appendChild(el("button", { class: "btn yes", onclick: function () { state.adForm = true; render(); } }, ["+ Post an ad"]));
+    frag.appendChild(el("div", { class: "row" }, ["all"].concat(AD_CATS).map(function (c) {
+      return el("button", { class: "btn sm", "aria-pressed": String(state.mf === c), onclick: function () { state.mf = c; render(); } }, [c === "all" ? "All" : c]);
+    })));
+    var shown = LISTINGS.filter(function (a) { return state.mf === "all" || a.cat === state.mf; });
+    if (!shown.length) frag.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "No ads in this category yet." })]));
+    shown.forEach(function (a) { frag.appendChild(adCard(a, false)); });
+    return frag;
+  }
+
+  /* ---------- Board tab ---------- */
+  function boardView() {
+    var frag = document.createDocumentFragment();
+    var form = el("form", { id: "post-form", onsubmit: function (e) {
+      e.preventDefault();
+      var text = document.getElementById("p-text").value.trim();
+      if (!text) return;
+      var anon = document.getElementById("p-anon").checked;
+      posts.unshift({ id: Date.now(), kind: document.getElementById("p-kind").value, topic: document.getElementById("p-topic").value, by: anon ? "Anonymous founder" : state.profile.name, anon: anon, mine: true, text: text, age: "now", replies: 0 });
+      state.filter = "all"; render();
+    } }, [
+      el("div", { class: "row" }, [
+        el("select", { id: "p-kind", "aria-label": "Post type", style: "flex:1" }, [el("option", { value: "ask", text: "Ask" }), el("option", { value: "offer", text: "Offer" })]),
+        el("select", { id: "p-topic", "aria-label": "Topic", style: "flex:1" }, ["Customers", "Pricing", "Legal", "Design", "Finance", "Hiring"].map(function (t) { return el("option", { value: t, text: t }); }))
+      ]),
+      el("textarea", { id: "p-text", rows: "2", placeholder: "What do you need, or what can you offer this week?", "aria-label": "Post text" }),
+      el("label", { class: "row small", for: "p-anon" }, [el("input", { type: "checkbox", id: "p-anon" }), "Post anonymously"]),
+      el("p", { class: "hint", text: "Other founders won't see your name. MEC moderators can, to keep the board respectful." }),
+      el("button", { class: "btn yes", type: "submit" }, ["Post (expires in 3 weeks)"])
+    ]);
+    frag.appendChild(el("div", { class: "card" }, [form]));
+    frag.appendChild(el("div", { class: "row" }, ["all", "ask", "offer"].map(function (f) {
+      return el("button", { class: "btn sm", "aria-pressed": String(state.filter === f), onclick: function () { state.filter = f; render(); } }, [f === "all" ? "All" : f === "ask" ? "Asks" : "Offers"]);
+    })));
+    var shown = posts.filter(function (p) { return state.filter === "all" || p.kind === state.filter; });
+    frag.appendChild(el("div", { class: "card" }, [el("div", { class: "list" }, shown.map(function (p) {
+      var replied = state.replied[p.id], n = p.replies + (replied ? 1 : 0);
+      return el("div", { class: "item" }, [
+        el("div", { class: "row" }, [el("span", { class: "kind " + p.kind, text: p.kind }), el("span", { class: "chip", text: p.topic }), el("span", { class: "muted small", text: p.age })]),
+        el("div", { text: p.text }),
+        el("div", { class: "row between" }, [
+          el("span", { class: "muted small", text: p.by + (p.mine && p.anon ? " (you)" : "") + " · " + n + (n === 1 ? " reply" : " replies") }),
+          p.mine || p.by.indexOf("Fern") === 0 ? null : el("button", { class: "btn sm", "aria-pressed": String(!!replied), onclick: function () { state.replied[p.id] = !state.replied[p.id]; render(); } }, [replied ? "Replied" : p.kind === "ask" ? "I can help" : "I'm interested"])
+        ])
+      ]);
+    }))]));
+    return frag;
+  }
+
+  function render() {
+    view.textContent = "";
+    if (state.tab !== "profile") state.profileSaved = false;
+    var v = state.tab === "match" ? matchView() : state.tab === "network" ? networkView() : state.tab === "circles" ? circlesView() : state.tab === "profile" ? profileView() : state.tab === "market" ? marketView() : boardView();
+    view.appendChild(v);
+    ["match", "network", "circles", "board", "market"].forEach(function (t) { document.getElementById("t-" + t).setAttribute("aria-selected", String(state.tab === t)); });
+    document.getElementById("s-conn").textContent = state.connected.length;
+    document.getElementById("s-intros").textContent = state.connected.filter(function (c) { return c.intro; }).length;
+    document.getElementById("s-sales").textContent = state.connected.filter(function (c) { return c.sale; }).length;
+    var b = document.getElementById("badge");
+    b.hidden = !state.incoming.length; b.textContent = state.incoming.length;
+    document.getElementById("me-name").textContent = state.profile.name;
+  }
+
+  document.querySelectorAll("[data-tab]").forEach(function (b) {
+    b.addEventListener("click", function () { state.tab = b.getAttribute("data-tab"); if (state.tab === "market") state.viewBiz = null; try { history.replaceState(null, "", "#" + state.tab); } catch (e) {} render(); });
+  });
+    /* ---------- Search ---------- */
+  var searchEl = document.getElementById("search"), qEl = document.getElementById("q"), resEl = document.getElementById("results"), sBtn = document.getElementById("search-btn");
+  function setHash() { try { history.replaceState(null, "", "#" + state.tab); } catch (e) {} }
+  function closeSearch() { searchEl.hidden = true; sBtn.setAttribute("aria-expanded", "false"); qEl.value = ""; resEl.textContent = ""; }
+  function unseenCat(p) {
+    return ORDER.filter(function (c) { return p.cats.indexOf(c) > -1 && !state.seen[c + ":" + p.id]; })[0] || null;
+  }
+  function openPerson(p) {
+    if (isLinked(p.id)) { state.tab = "network"; state.nf = "all"; }
+    else {
+      var k = unseenCat(p);
+      if (!k) return;
+      state.cat = k; state.tab = "match"; state.focusId = p.id; state.matchNote = null; state.composing = null;
+    }
+    setHash(); closeSearch(); render();
+  }
+  function runSearch() {
+    var q = qEl.value.trim().toLowerCase();
+    resEl.textContent = "";
+    if (!q) return;
+    var catHits = ORDER.filter(function (k) { return CATS[k].label.toLowerCase().indexOf(q) > -1; });
+    var peopleHits = people.filter(function (p) {
+      return p.name.toLowerCase().indexOf(q) > -1 || p.does.toLowerCase().indexOf(q) > -1 ||
+        p.cats.some(function (k) { return CATS[k].label.toLowerCase().indexOf(q) > -1; });
+    });
+    catHits.forEach(function (k) {
+      resEl.appendChild(el("div", { class: "res" }, [
+        el("div", {}, [el("b", { text: CATS[k].label }), el("div", { class: "muted small", text: "Category · " + CATS[k].blurb })]),
+        el("button", { class: "btn sm", onclick: function () { state.cat = k; state.tab = "match"; state.focusId = null; state.matchNote = null; state.composing = null; setHash(); closeSearch(); render(); } }, ["Browse"])
+      ]));
+    });
+    peopleHits.forEach(function (p) {
+      var linked = isLinked(p.id), k = unseenCat(p);
+      var action = linked ? "See in Network" : k ? "View profile" : "Already reviewed";
+      resEl.appendChild(el("div", { class: "res" }, [
+        el("div", { class: "who" }, [el("div", { class: "avatar sm", text: p.short }), el("div", {}, [el("b", { text: p.name }), el("div", { class: "muted small", text: p.cats.map(function (c) { return CATS[c].label; }).join(" · ") })])]),
+        el("button", { class: "btn sm", disabled: (!linked && !k) ? "disabled" : null, onclick: function () { openPerson(p); } }, [action])
+      ]));
+    });
+    if (!catHits.length && !peopleHits.length) resEl.appendChild(el("div", { class: "muted small", text: "No businesses or categories match \"" + qEl.value.trim() + "\"." }));
+  }
+  sBtn.addEventListener("click", function () {
+    if (searchEl.hidden) { searchEl.hidden = false; sBtn.setAttribute("aria-expanded", "true"); qEl.focus(); } else { closeSearch(); }
+  });
+  qEl.addEventListener("input", runSearch);
+  qEl.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeSearch(); sBtn.focus(); } });
+
+  document.getElementById("to-profile").addEventListener("click", function () { state.tab = "profile"; try { history.replaceState(null, "", "#profile"); } catch (e) {} render(); });
+  function fromHash() { var h = (location.hash || "").slice(1); if (["match", "network", "circles", "board", "market", "profile"].indexOf(h) > -1) state.tab = h; }
+  window.addEventListener("hashchange", function () { fromHash(); render(); });
+  fromHash();
+  render();
+})();
+</script>
+
+</body>
+</html>
